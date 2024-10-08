@@ -66,6 +66,42 @@ namespace MyML
             return Softmax(result);
         }
 
+        public void Learn(Matrix<double> output, Matrix<double> targetResult, double learningRate, out double logLoss)
+        {
+            logLoss = LogLoss(output, targetResult);
+            Matrix<double> dLdY = output - targetResult;
+            for (int i = Layers.Length - 1; i >= 0; i--)
+            {
+                dLdY = Layers[i].BackPropAndLearn(dLdY, learningRate, ActFunction, out _);
+            }
+        }
+
+        public static double LogLoss(Matrix<double> real, Matrix<double> ideal)
+        {
+            if (real.ColumnCount != 1 || ideal.ColumnCount != 1 || real.RowCount != ideal.RowCount)
+                throw new ArgumentException("");
+
+            double result = 0;
+            for (int i = 0; i < real.RowCount; i++)
+            {
+                if (real[i, 0] == 0 || ideal[i, 0] == 0)
+                    continue;
+
+                result -= ideal[i, 0] * Math.Log(real[i, 0]);
+            }
+
+            return result;
+        }
+
+        public Matrix<double> RunAndLearn(Matrix<double> input, Matrix<double> targetResult, double learningRate, out double logLoss)
+        {
+            Matrix<double> output = Run(input);
+
+            Learn(output, targetResult, learningRate, out logLoss);
+
+            return output;
+        }
+
         public override string ToString()
         {
             string result = $"{Layers.Length}:[ ";

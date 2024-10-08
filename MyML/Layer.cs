@@ -83,6 +83,20 @@ namespace MyML
             return result;
         }
 
+        public Matrix<double> BackPropAndLearn(Matrix<double> dLdY, double learningRate, IActFunction actFunctuin, out Matrix<double> dLdW)
+        {
+            if (dLdY.RowCount != OutputsNumber || dLdY.ColumnCount != 1)
+                throw new ArgumentException();
+
+            Matrix<double> dYdP = GetdYdP(VectorP??throw new NullReferenceException(), actFunctuin);
+            Matrix<double> dLdP = dYdP.TransposeThisAndMultiply(dLdY);
+            dLdW = dLdP * VectorX.Transpose();
+            Matrix<double> dLdX = WeightsMatrix.TransposeThisAndMultiply(dLdP);
+
+            WeightsMatrix = WeightsMatrix - (learningRate * dLdW);
+            return dLdX;
+        }
+
         public override string ToString()
         {
             return $"[{InputsNumber} -> {OutputsNumber}]";
