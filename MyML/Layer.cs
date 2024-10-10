@@ -97,6 +97,10 @@ namespace MyML
             return dLdX;
         }
 
+        public void SetWeights(double[] weights)
+        {
+            WeightsMatrix = Matrix<double>.Build.Dense(WeightsMatrix.RowCount, WeightsMatrix.ColumnCount, weights);
+        }
         public override string ToString()
         {
             return $"[{InputsNumber} -> {OutputsNumber}]";

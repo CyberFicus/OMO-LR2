@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.Random;
+using System.Text.Json;
 
 namespace MyML
 {
@@ -35,6 +37,41 @@ namespace MyML
             }
             InputSize = LayerSizes[0];
             OutputSize = LayerSizes[LayerSizes.Length-1];
+        }
+        internal NN(NNStorage data, IActFunction actFunction)
+        {
+            if (data.LayerSizes.Length < 2)
+                throw new ArgumentException();
+
+            ActFunction = actFunction;
+            ActFunction = actFunction;
+            LayerSizes = (int[]) data.LayerSizes.Clone();
+            Layers = new Layer[data.LayerSizes.Length - 1];
+            
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                Layers[i] = new Layer(data.LayerSizes[i], data.LayerSizes[i + 1]);
+                Layers[i].SetWeights(data.Weights[i].ToArray());
+            }
+            InputSize = LayerSizes[0];
+            OutputSize = LayerSizes[LayerSizes.Length - 1];
+        }
+
+        public static NN BuildFromJson(string path, IActFunction actFunction)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException();
+
+            string serialized = File.ReadAllText(path);
+            NNStorage deserialized = JsonSerializer.Deserialize<NNStorage>(serialized) ?? throw new Exception("Unable to deserialize");
+            return new NN(deserialized, actFunction);
+        }
+
+        public void ExportToJson(string path)
+        {
+            var storage = new NNStorage(this);
+            string serialized = JsonSerializer.Serialize(storage);
+            File.WriteAllText(path, serialized);
         }
 
         public static Matrix<double> Softmax(Matrix<double> input)
@@ -147,16 +184,14 @@ namespace MyML
             return result;
         }
 
-        public Stats LearnFromFile(string filename, double learningRate)
+        public void LearnFromFile(string filename, double learningRate) 
         {
             if (!File.Exists(filename))
                 throw new FileNotFoundException();
 
-            var cn = new ConfusionMatrix(OutputSize);
-            double logLossSum = 0;
             using (StreamReader sr = new StreamReader(filename))
             {
-                while (! sr.EndOfStream)
+                while (!sr.EndOfStream)
                 {
                     string? buf = sr.ReadLine();
                     if (buf == null)
@@ -165,15 +200,9 @@ namespace MyML
                     var inputVector = ParseStringCSV(csvString, out int classNumber);
                     var ideal = BuildIdeal(classNumber);
 
-                    var networkOutput = RunAndLearn(inputVector, ideal, learningRate, out double logLoss);
-                    
-                    int decision = DecideBySoftmax(networkOutput);
-                    cn.AddResult(classNumber, decision);
-                    logLossSum += logLoss;
+                    RunAndLearn(inputVector, ideal, learningRate, out double logLoss);
                 }
             }
-            
-            return new Stats(cn, logLossSum);
         }
 
         public Stats RunFromFile(string filename)
