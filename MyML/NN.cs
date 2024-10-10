@@ -102,6 +102,110 @@ namespace MyML
             return output;
         }
 
+        public Matrix<double> BuildIdeal(int classNumber)
+        {
+            int outputsNumber = Layers[Layers.Length - 1].OutputsNumber;
+            if (classNumber >= outputsNumber)
+                throw new ArgumentException();
+
+            var ideal = Matrix<double>.Build.Dense(outputsNumber, 1);
+            ideal[classNumber, 0] = 1;
+
+            return ideal;
+        }
+
+        public int DecideBySoftmax(Matrix<double> softmaxxedOutput)
+        {
+            if (softmaxxedOutput.ColumnCount != 1 || softmaxxedOutput.RowCount != OutputSize)
+                throw new ArgumentException();
+
+            double max = softmaxxedOutput[0, 0];
+            int index = 0;
+            for (int i = 1; i < OutputSize; i++) 
+            { 
+                if (softmaxxedOutput[i, 0] > max)
+                {
+                    index = i;
+                    max = softmaxxedOutput[i, 0];
+                }
+            }
+
+            return index;
+        }
+
+        public Matrix<double> ParseStringCSV(string csv, out int classNumber )
+        {
+            string[] split = csv.Split(',');
+
+            classNumber = int.Parse(split[1]);
+
+            Matrix<double> result = Matrix<double>.Build.Dense(split[2].Length,1);
+            for (int i = 0; i < split[2].Length; i++) {
+                result[i, 0] = (split[2][i] == '1') ? 1 : 0;
+            }
+
+            return result;
+        }
+
+        public Stats LearnFromFile(string filename, double learningRate)
+        {
+            if (!File.Exists(filename))
+                throw new FileNotFoundException();
+
+            var cn = new ConfusionMatrix(OutputSize);
+            double logLossSum = 0;
+            using (StreamReader sr = new StreamReader(filename))
+            {
+                while (! sr.EndOfStream)
+                {
+                    string? buf = sr.ReadLine();
+                    if (buf == null)
+                        break;
+                    string csvString = buf;
+                    var inputVector = ParseStringCSV(csvString, out int classNumber);
+                    var ideal = BuildIdeal(classNumber);
+
+                    var networkOutput = RunAndLearn(inputVector, ideal, learningRate, out double logLoss);
+                    
+                    int decision = DecideBySoftmax(networkOutput);
+                    cn.AddResult(classNumber, decision);
+                    logLossSum += logLoss;
+                }
+            }
+            
+            return new Stats(cn, logLossSum);
+        }
+
+        public Stats RunFromFile(string filename)
+        {
+            if (!File.Exists(filename))
+                throw new FileNotFoundException();
+
+            var cn = new ConfusionMatrix(OutputSize);
+            double logLossSum = 0;
+            using (StreamReader sr = new StreamReader(filename))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string? buf = sr.ReadLine();
+                    if (buf == null)
+                        break;
+                    string csvString = buf;
+                    var inputVector = ParseStringCSV(csvString, out int classNumber);
+                    var ideal = BuildIdeal(classNumber);
+
+                    var networkOutput = Run(inputVector);
+                    double logLoss = LogLoss(networkOutput, ideal);
+
+                    int decision = DecideBySoftmax(networkOutput);
+                    cn.AddResult(classNumber, decision);
+                    logLossSum += logLoss;
+                }
+            }
+
+            return new Stats(cn, logLossSum);
+        }
+
         public override string ToString()
         {
             string result = $"{Layers.Length}:[ ";
