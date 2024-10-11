@@ -11,6 +11,8 @@ namespace MyML
     {
         public int[] LayerSizes {  get; private set; }
         public List<double>[] Weights { get; private set; }
+        public int EpochCount { get; private set; }
+        public List<EpochStats> EpochStats { get; private set; }
         
         public NNStorage(NN nn) {
             LayerSizes = nn.LayerSizes;
@@ -20,13 +22,17 @@ namespace MyML
                 Layer layer = nn.Layers[i];
                 Weights[i] = new List<double>(layer.WeightsMatrix.AsColumnMajorArray());
             }
+            EpochCount = nn.EpochCount;
+            EpochStats = nn.EpochStats;
         }
 
         [JsonConstructor]
-        public NNStorage(int[] LayerSizes, List<double>[] Weights)
+        public NNStorage(int[] LayerSizes, List<double>[] Weights, int EpochCount, List<EpochStats> EpochStats)
         {
             this.LayerSizes = LayerSizes;
             this.Weights = Weights;
+            this.EpochCount = EpochCount;
+            this.EpochStats = EpochStats;
         }
     }
 }

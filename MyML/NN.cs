@@ -16,8 +16,10 @@ namespace MyML
         public int[] LayerSizes { get; private set; }
         public int InputSize { get; private set; }
         public int OutputSize {  get; private set; }
-        public Layer[] Layers { get; private set; }
-        
+        public Layer[] Layers { get; private set; }    
+        public int EpochCount { get; private set; }
+        public List<EpochStats> EpochStats { get; private set; }
+
         public NN(int[] parameters, IActFunction actFunction, int? randSeed = null)
         {
             // [входных сигналов, нейронов первого слоя, нейронов второго слоя, ...]
@@ -27,6 +29,7 @@ namespace MyML
             ActFunction = actFunction;
             LayerSizes = (int[]) parameters.Clone();
             Layers = new Layer[parameters.Length - 1];
+            EpochStats = new List<EpochStats>();
 
             Random random = (randSeed is null) ? new Random() : new Random(randSeed.Value);
 
@@ -37,6 +40,7 @@ namespace MyML
             }
             InputSize = LayerSizes[0];
             OutputSize = LayerSizes[LayerSizes.Length-1];
+            EpochCount = 0;
         }
         internal NN(NNStorage data, IActFunction actFunction)
         {
@@ -55,6 +59,8 @@ namespace MyML
             }
             InputSize = LayerSizes[0];
             OutputSize = LayerSizes[LayerSizes.Length - 1];
+            EpochCount = data.EpochCount;
+            EpochStats = data.EpochStats;
         }
 
         public static NN BuildFromJson(string path, IActFunction actFunction)
@@ -233,6 +239,15 @@ namespace MyML
             }
 
             return new Stats(cn, logLossSum);
+        }
+
+        public void EpochFromFiles(string trainingFile, string validationFile, double learningRate)
+        {
+            LearnFromFile(trainingFile, learningRate);
+            var trainingStats = RunFromFile(trainingFile);
+            var validationStats = RunFromFile(validationFile);
+            EpochCount++;
+            EpochStats.Add(new EpochStats(trainingStats, validationStats));
         }
 
         public override string ToString()
