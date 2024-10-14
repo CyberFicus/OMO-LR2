@@ -68,6 +68,8 @@ namespace LR2Form
             inputContols.Add(LearnBTN);
             inputContols.Add(ShowstatsBTN);
             inputContols.Add(ShowgraphBTN);
+
+            InitCanvas();
         }
 
         private void LearningRateTrackbar_Scroll(object sender, EventArgs e)
@@ -331,5 +333,48 @@ namespace LR2Form
             CreateNN();
             Output.Text = "Обучение сброшено";
         }
+
+        private bool IsDrawing { get; set; }
+        private void Canvas_MouseUp(object sender, MouseEventArgs e)
+        {
+            IsDrawing = false;
+        }
+
+        private void Canvas_MouseDown(object sender, MouseEventArgs e)
+        {
+            IsDrawing = true;
+        }
+
+        private void Canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!IsDrawing)
+                return;
+
+            graphics.DrawEllipse(pen, e.X / 4, e.Y / 4, 1, 1);
+            Canvas.Image = bitmap;
+        }
+
+        private Graphics graphics;
+        private Pen pen = new Pen(Color.Black, 2f);
+        private Bitmap bitmap { get; set; }
+
+        private void InitCanvas()
+        {
+            bitmap = new Bitmap(64, 64);
+            graphics = Graphics.FromImage(bitmap);
+            Canvas.Image = bitmap;
+        }
+        private void ThicknessTrackbar_Scroll(object sender, EventArgs e)
+        {
+            ThicknessLabel.Text = $"{ThicknessTrackbar.Value}px";
+            pen.Width = (float)ThicknessTrackbar.Value;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            InitCanvas();
+        }
+
+        private string[] clasess = ["Arc", "Bard", "Yandex (Y)", "Yandex (Я)", "Bing", "Opera", "Explorer", "Google", "Edge", "Chrome"];
     }
 }

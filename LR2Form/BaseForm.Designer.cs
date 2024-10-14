@@ -43,9 +43,15 @@
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             ResetBTN = new Button();
+            Canvas = new PictureBox();
+            button1 = new Button();
+            ThicknessTrackbar = new TrackBar();
+            ThicknessLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)LearningRateTrackbar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)EpochNumberTrackbar).BeginInit();
             TrackbarPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)Canvas).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)ThicknessTrackbar).BeginInit();
             SuspendLayout();
             // 
             // LearnBTN
@@ -185,17 +191,64 @@
             // 
             ResetBTN.Location = new Point(652, 25);
             ResetBTN.Name = "ResetBTN";
-            ResetBTN.Size = new Size(100, 30);
+            ResetBTN.Size = new Size(100, 60);
             ResetBTN.TabIndex = 11;
-            ResetBTN.Text = "Сброс";
+            ResetBTN.Text = "Сброс обучения";
             ResetBTN.UseVisualStyleBackColor = true;
             ResetBTN.Click += ResetBTN_Click;
+            // 
+            // Canvas
+            // 
+            Canvas.BorderStyle = BorderStyle.Fixed3D;
+            Canvas.Location = new Point(614, 128);
+            Canvas.Name = "Canvas";
+            Canvas.Size = new Size(256, 256);
+            Canvas.SizeMode = PictureBoxSizeMode.StretchImage;
+            Canvas.TabIndex = 12;
+            Canvas.TabStop = false;
+            Canvas.MouseDown += Canvas_MouseDown;
+            Canvas.MouseMove += Canvas_MouseMove;
+            Canvas.MouseUp += Canvas_MouseUp;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(770, 390);
+            button1.Name = "button1";
+            button1.Size = new Size(100, 60);
+            button1.TabIndex = 13;
+            button1.Text = "Сброс рисунка";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // ThicknessTrackbar
+            // 
+            ThicknessTrackbar.Location = new Point(622, 390);
+            ThicknessTrackbar.Maximum = 5;
+            ThicknessTrackbar.Minimum = 1;
+            ThicknessTrackbar.Name = "ThicknessTrackbar";
+            ThicknessTrackbar.Size = new Size(103, 56);
+            ThicknessTrackbar.TabIndex = 8;
+            ThicknessTrackbar.Value = 2;
+            ThicknessTrackbar.Scroll += ThicknessTrackbar_Scroll;
+            // 
+            // ThicknessLabel
+            // 
+            ThicknessLabel.AutoSize = true;
+            ThicknessLabel.Location = new Point(731, 390);
+            ThicknessLabel.Name = "ThicknessLabel";
+            ThicknessLabel.Size = new Size(33, 20);
+            ThicknessLabel.TabIndex = 8;
+            ThicknessLabel.Text = "2px";
             // 
             // BaseForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(882, 453);
+            Controls.Add(ThicknessLabel);
+            Controls.Add(ThicknessTrackbar);
+            Controls.Add(button1);
+            Controls.Add(Canvas);
             Controls.Add(ResetBTN);
             Controls.Add(SaveBTN);
             Controls.Add(LoadBTN);
@@ -210,7 +263,10 @@
             ((System.ComponentModel.ISupportInitialize)EpochNumberTrackbar).EndInit();
             TrackbarPanel.ResumeLayout(false);
             TrackbarPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)Canvas).EndInit();
+            ((System.ComponentModel.ISupportInitialize)ThicknessTrackbar).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -230,5 +286,9 @@
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
         private Button ResetBTN;
+        private PictureBox Canvas;
+        private Button button1;
+        private TrackBar ThicknessTrackbar;
+        private Label ThicknessLabel;
     }
 }
