@@ -44,9 +44,12 @@
             saveFileDialog = new SaveFileDialog();
             ResetBTN = new Button();
             Canvas = new PictureBox();
-            button1 = new Button();
+            ResetCanvasBTN = new Button();
             ThicknessTrackbar = new TrackBar();
             ThicknessLabel = new Label();
+            ClassComboBox = new ComboBox();
+            RecoginzeBTN = new Button();
+            PunishBTN = new Button();
             ((System.ComponentModel.ISupportInitialize)LearningRateTrackbar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)EpochNumberTrackbar).BeginInit();
             TrackbarPanel.SuspendLayout();
@@ -210,15 +213,15 @@
             Canvas.MouseMove += Canvas_MouseMove;
             Canvas.MouseUp += Canvas_MouseUp;
             // 
-            // button1
+            // ResetCanvasBTN
             // 
-            button1.Location = new Point(770, 390);
-            button1.Name = "button1";
-            button1.Size = new Size(100, 60);
-            button1.TabIndex = 13;
-            button1.Text = "Сброс рисунка";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            ResetCanvasBTN.Location = new Point(770, 390);
+            ResetCanvasBTN.Name = "ResetCanvasBTN";
+            ResetCanvasBTN.Size = new Size(100, 60);
+            ResetCanvasBTN.TabIndex = 13;
+            ResetCanvasBTN.Text = "Сброс рисунка";
+            ResetCanvasBTN.UseVisualStyleBackColor = true;
+            ResetCanvasBTN.Click += ResetCanvasBTN_Click;
             // 
             // ThicknessTrackbar
             // 
@@ -240,14 +243,49 @@
             ThicknessLabel.TabIndex = 8;
             ThicknessLabel.Text = "2px";
             // 
+            // ClassComboBox
+            // 
+            ClassComboBox.DisplayMember = "1";
+            ClassComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            ClassComboBox.FormattingEnabled = true;
+            ClassComboBox.Items.AddRange(new object[] { "Arc", "Bard", "Yandex (Y)", "Yandex (Я)", "Bing", "Opera", "Explorer", "Google", "Edge", "Chrome" });
+            ClassComboBox.Location = new Point(440, 128);
+            ClassComboBox.Name = "ClassComboBox";
+            ClassComboBox.Size = new Size(100, 28);
+            ClassComboBox.TabIndex = 14;
+            // 
+            // RecoginzeBTN
+            // 
+            RecoginzeBTN.Location = new Point(440, 162);
+            RecoginzeBTN.Name = "RecoginzeBTN";
+            RecoginzeBTN.Size = new Size(100, 30);
+            RecoginzeBTN.TabIndex = 15;
+            RecoginzeBTN.Text = "Распознать";
+            RecoginzeBTN.UseVisualStyleBackColor = true;
+            RecoginzeBTN.Click += RecoginzeBTN_Click;
+            // 
+            // PunishBTN
+            // 
+            PunishBTN.Enabled = false;
+            PunishBTN.Location = new Point(440, 198);
+            PunishBTN.Name = "PunishBTN";
+            PunishBTN.Size = new Size(100, 30);
+            PunishBTN.TabIndex = 16;
+            PunishBTN.Text = "Наказать";
+            PunishBTN.UseVisualStyleBackColor = true;
+            PunishBTN.Click += PunishBTN_Click;
+            // 
             // BaseForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(882, 453);
+            Controls.Add(PunishBTN);
+            Controls.Add(RecoginzeBTN);
+            Controls.Add(ClassComboBox);
             Controls.Add(ThicknessLabel);
             Controls.Add(ThicknessTrackbar);
-            Controls.Add(button1);
+            Controls.Add(ResetCanvasBTN);
             Controls.Add(Canvas);
             Controls.Add(ResetBTN);
             Controls.Add(SaveBTN);
@@ -287,8 +325,11 @@
         private SaveFileDialog saveFileDialog;
         private Button ResetBTN;
         private PictureBox Canvas;
-        private Button button1;
+        private Button ResetCanvasBTN;
         private TrackBar ThicknessTrackbar;
         private Label ThicknessLabel;
+        private ComboBox ClassComboBox;
+        private Button RecoginzeBTN;
+        private Button PunishBTN;
     }
 }

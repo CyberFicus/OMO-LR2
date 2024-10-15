@@ -1,6 +1,8 @@
 using MyML;
 using MyML.Functions;
+using System.Drawing.Drawing2D;
 using static System.Net.Mime.MediaTypeNames;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace LR2Form
 {
@@ -41,7 +43,7 @@ namespace LR2Form
 
         private void CreateNN()
         {
-            int[] nnparams = [64 * 64, 64, 32, 10];
+            int[] nnparams = [64 * 64, 64*20, 10];
             func = new Sigmoid();
             nn = new NN(nnparams, func);
         }
@@ -63,11 +65,15 @@ namespace LR2Form
             UpdateLearningRateLabel();
             UpdateEpochNumberLabel();
 
+            ClassComboBox.SelectedIndex = 0;
+
             inputContols.Add(LearningRateTrackbar);
             inputContols.Add(EpochNumberTrackbar);
             inputContols.Add(LearnBTN);
             inputContols.Add(ShowstatsBTN);
             inputContols.Add(ShowgraphBTN);
+            inputContols.Add(RecoginzeBTN);
+            inputContols.Add(PunishBTN);
 
             InitCanvas();
         }
@@ -119,10 +125,10 @@ namespace LR2Form
                     {
                         Output.Text += $"Потери на тренировочной выборке: {stats.TrainingStats.Loss.ToString("F4")}\n";
                         Output.Text += $"Потери на валидационной выборке: {stats.ValidationStats.Loss.ToString("F4")}\n";
-                        Output.Text += $"ОБУЧЕНИЕ ЗАВЕРШЕНО\n";
                     });
                 }
                 Output.Invoke(() => EnableInput());
+                Output.Text += $"ОБУЧЕНИЕ ЗАВЕРШЕНО\n";
             });
         }
 
@@ -330,6 +336,7 @@ namespace LR2Form
 
         private void ResetBTN_Click(object sender, EventArgs e)
         {
+            PunishBTN.Enabled = false;
             CreateNN();
             Output.Text = "Обучение сброшено";
         }
@@ -370,11 +377,64 @@ namespace LR2Form
             pen.Width = (float)ThicknessTrackbar.Value;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ResetCanvasBTN_Click(object sender, EventArgs e)
         {
             InitCanvas();
         }
 
-        private string[] clasess = ["Arc", "Bard", "Yandex (Y)", "Yandex (Я)", "Bing", "Opera", "Explorer", "Google", "Edge", "Chrome"];
+        private string[] classes = ["Arc", "Bard", "Yandex (Y)", "Yandex (Я)", "Bing", "Opera", "Explorer", "Google", "Edge", "Chrome"];
+
+        private Matrix<double> InputFromCanvas()
+        {
+            Matrix<double> inputVector = Matrix<double>.Build.Dense(nn.InputSize, 1);
+
+            Bitmap bitmap = new Bitmap(Canvas.Image);
+
+            int i = 0;
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    var pixel = bitmap.GetPixel(x, y);
+                    if (pixel.A / 255 > 0.5)
+                        inputVector[i, 0] = 1;
+                    i++;
+                }
+            }
+            string testString = "";
+            for (int j = 0; j < inputVector.RowCount; j++)
+                testString += ((int)inputVector[j, 0]).ToString();
+
+            return inputVector;
+        }
+        private string OutputPresentation(Matrix<double> output)
+        {
+            string result = "";
+            for (int i = 0; i < output.RowCount; i++)
+                result += $"{output[i, 0].ToString("F3")} : {classes[i]}\n";
+            return result;
+        }
+
+        Matrix<double> outputVector;
+        private void RecoginzeBTN_Click(object sender, EventArgs e)
+        {
+            var input = InputFromCanvas();
+            outputVector = nn.Run(input);
+            int decidedClass = nn.DecideBySoftmax(outputVector);
+            Output.Text = $"Предсказанное значение: {classes[decidedClass]}\n\n";
+            Output.Text += $"Вектор результатов:\n{OutputPresentation(outputVector)}";
+            PunishBTN.Enabled = true;
+        }
+
+        private void PunishBTN_Click(object sender, EventArgs e)
+        {
+            var input = InputFromCanvas();
+            nn.Learn(outputVector, nn.BuildIdeal(ClassComboBox.SelectedIndex), LearningRate, out double _);
+            outputVector = nn.Run(input);
+            int decidedClass = nn.DecideBySoftmax(outputVector);
+            Output.Text = $"Предсказанное значение: {classes[decidedClass]}\n\n";
+            Output.Text += $"Вектор результатов:\n{OutputPresentation(outputVector)}";
+
+        }
     }
 }
