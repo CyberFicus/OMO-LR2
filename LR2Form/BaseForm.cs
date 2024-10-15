@@ -246,7 +246,7 @@ namespace LR2Form
                 Output.Text += Point(i + 1, stats.Loss);
             }
             Output.Text += "\n";
-            Output.Text = "Потери на валидационной выборке:\n";
+            Output.Text += "Потери на валидационной выборке:\n";
             for (int i = 0; i < nn.EpochCount; i++)
             {
                 var stats = estats[i].ValidationStats;
