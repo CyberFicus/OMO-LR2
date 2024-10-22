@@ -43,7 +43,7 @@ namespace LR2Form
 
         private void CreateNN()
         {
-            int[] nnparams = [64 * 64, 64*20, 10];
+            int[] nnparams = [64 * 64, 64*8, 64*4, 64, 10];
             func = new Sigmoid();
             nn = new NN(nnparams, func);
         }
@@ -239,7 +239,7 @@ namespace LR2Form
                 return $"({x};{y.ToString(format)})";
             }
 
-            Output.Text += "Потери на тренировочной выборке:\n";
+            Output.Text = "Потери на тренировочной выборке:\n";
             for (int i = 0; i < nn.EpochCount; i++)
             {
                 var stats = estats[i].TrainingStats;
